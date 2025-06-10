@@ -7,11 +7,11 @@ import type { Request, Response } from "express"
 const repo = new SampleRepository()
 
 export async function getSampleById(req: Request, res: Response): Promise<void> {
-  logger.info("[getDryFood controller] called")
+  logger.info("[getSampleById controller] called")
   const { id } = req.body
   try {
     const data = await repo.getSampleById(id)
-    successMessage(res, "Dry food fetched successfully", data)
+    successMessage(res, "sample fetched successfully", data)
   }
   catch (e) {
     logger.error(e)
