@@ -1,0 +1,31 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+This rule describes the guidelines for naming convention.
+
+- Always use names that are pronounceable and searchable.
+- Use English throughout the codebase.
+- Avoid Acronyms or abbreviations.
+
+Functions
+- Start the function name with a verb (p.ex.: find, fecth, add, remove, map, delete)
+- Limit the function parameters to 2, destructure function parameters if more parameters are needed.
+- When destructuring parameters, avoid inline types. Prefer creating a named type instead.
+- If the function returns a boolean, use predicate names (is, has)
+- Prefer using diferent verbs for single or multiple returns (e.g. getOrder for single record, listOrder for multiple records).
+- Prefer using diferent verbs for partial and full update (e.g. overwrite or replace for full update; edit or modify for partial update)
+
+Properties/fields/variables
+- Use nouns or adjectives
+- Avoid prefixes and suffixes that do not add value (e.g. Manager, Data, Field)
+
+Constants
+- Use SCREAMING_SNAKE_CASE
+
+Types
+- Use PascalCase for type names
+- Use singular noums
+- Avoid prefixes
+- Do not include the words Type or Class or Enum in the name.

@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Every environment variable should be referenced in the [env.ts](mdc:src/config/env.ts).
+No other file should reference process.env.
+Every other file, if needs to use environment variables, should import from [env.ts](mdc:src/config/env.ts).
