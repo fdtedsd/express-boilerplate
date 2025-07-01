@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "3.830.0",
+    "aws-jwt-verify": "5.1.0",
     "axios": "1.9.0",
     "cors": "2.8.5",
     "dotenv": "16.5.0",
