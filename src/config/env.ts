@@ -10,5 +10,10 @@ export const envs = {
   LOG_LEVEL: process.env.LOG_LEVEL ?? "info",
   APP_PORT: parseInt(process.env.APP_PORT ?? "3000", 10),
   APP_NAME: process.env.APP_NAME ?? "my-app",
-  KNEX_ENV: process.env.KNEX_ENV ?? "local"
+  KNEX_ENV: process.env.KNEX_ENV ?? "local",
+  COGNITO: {
+    POOL_ID: process.env.COGNITO_USER_POOL_ID ?? '',
+    CLIENT_ID: process.env.COGNITO_CLIENT_ID ?? '',
+    CLIENT_SECRET: process.env.COGNITO_CLIENT_SECRET ?? ''
+  }
 }
