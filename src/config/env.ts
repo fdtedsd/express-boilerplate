@@ -13,9 +13,9 @@ export const envs = {
   APP_NAME: process.env.APP_NAME ?? "my-app",
   KNEX_ENV: process.env.KNEX_ENV ?? "local",
   COGNITO: {
-    POOL_ID: process.env.COGNITO_USER_POOL_ID ?? '',
-    CLIENT_ID: process.env.COGNITO_CLIENT_ID ?? '',
-    CLIENT_SECRET: process.env.COGNITO_CLIENT_SECRET ?? ''
+    POOL_ID: process.env.COGNITO_USER_POOL_ID ?? "",
+    CLIENT_ID: process.env.COGNITO_CLIENT_ID ?? "",
+    CLIENT_SECRET: process.env.COGNITO_CLIENT_SECRET ?? ""
   },
   ECS: {
     TASK_ID: process.env.ECS_TASK_ID

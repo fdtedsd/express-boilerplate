@@ -1,4 +1,3 @@
-
 import { refresh, signIn, signUp } from "../controllers/auth"
 import { validateRefresh, validateSignIn } from "../validation/auth"
 

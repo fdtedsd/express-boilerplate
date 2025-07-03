@@ -1,12 +1,12 @@
-import { Auth } from "src/services/cognito"
+import { envs } from "../config/env"
 import { instance } from "../utils/logger"
 import { conflictMessage, errorMessage, successMessage, unauthorizedMessage } from "../utils/response"
 
 import { type Request, type Response } from "express"
-import { envs } from "../config/env"
-import jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken"
+import { Auth } from "src/services/cognito"
 
-const logger = instance("Controller")
+const logger = instance("Auth Controller")
 
 export async function refresh(req: Request, res: Response): Promise<void> {
   logger.info("refresh called")
@@ -16,10 +16,10 @@ export async function refresh(req: Request, res: Response): Promise<void> {
     clientId: envs.COGNITO.CLIENT_ID,
     poolId: envs.COGNITO.POOL_ID,
     secret: envs.COGNITO.CLIENT_SECRET
-  });
+  })
 
   try {
-    const data = await auth.refreshToken(sub, refreshToken);
+    const data = await auth.refreshToken(sub, refreshToken)
 
     if (data?.$metadata?.httpStatusCode === 200) {
       const response = {
@@ -27,10 +27,11 @@ export async function refresh(req: Request, res: Response): Promise<void> {
         accessToken: data?.AuthenticationResult?.AccessToken,
         refreshToken: data?.AuthenticationResult?.RefreshToken
       }
-      logger.info('successfully refreshed token')
+      logger.info("successfully refreshed token")
       successMessage(res, "authenticated", response)
-    } else {
-      logger.warn('unable to refresh', { data })
+    }
+    else {
+      logger.warn("unable to refresh", { data })
       const response = {
         requestId: data?.$metadata?.requestId
       }
@@ -41,7 +42,7 @@ export async function refresh(req: Request, res: Response): Promise<void> {
     logger.error("error at refresh", e as Error)
     errorMessage(`${e}`, res)
   }
-  logger.resetKeys();
+  logger.resetKeys()
 }
 
 export async function signIn(req: Request, res: Response): Promise<void> {
@@ -52,21 +53,22 @@ export async function signIn(req: Request, res: Response): Promise<void> {
     clientId: envs.COGNITO.CLIENT_ID,
     poolId: envs.COGNITO.POOL_ID,
     secret: envs.COGNITO.CLIENT_SECRET
-  });
+  })
 
   try {
-    const data = await auth.signin(username, password);
+    const data = await auth.signin(username, password)
 
     if (data?.metadata?.httpStatusCode === 200) {
-      let sub;
+      let sub
       if (data?.result?.IdToken) {
-        logger.info('authenticated')
+        logger.info("authenticated")
         try {
-          const decoded = jwt.decode(data.result.IdToken);
-          sub = decoded?.sub;
+          const decoded = jwt.decode(data.result.IdToken)
+          sub = decoded?.sub
           logger.appendKeys({ sub })
-        } catch (err) {
-          logger.error('Failed to decode IdToken payload', err as Error);
+        }
+        catch (err) {
+          logger.error("Failed to decode IdToken payload", err as Error)
         }
       }
 
@@ -78,10 +80,11 @@ export async function signIn(req: Request, res: Response): Promise<void> {
         refreshToken: data?.result?.RefreshToken,
         hash: data?.hash
       }
-      logger.info('successful response')
+      logger.info("successful response")
       successMessage(res, "authenticated", response)
-    } else {
-      logger.warn('unable to authenticate', { data })
+    }
+    else {
+      logger.warn("unable to authenticate", { data })
       const response = {
         requestId: data?.metadata?.requestId
       }
@@ -92,7 +95,7 @@ export async function signIn(req: Request, res: Response): Promise<void> {
     logger.error("error at refresh", e as Error)
     errorMessage(`${e}`, res)
   }
-  logger.resetKeys();
+  logger.resetKeys()
 }
 
 export async function signUp(req: Request, res: Response): Promise<void> {
@@ -103,17 +106,16 @@ export async function signUp(req: Request, res: Response): Promise<void> {
     clientId: envs.COGNITO.CLIENT_ID,
     poolId: envs.COGNITO.POOL_ID,
     secret: envs.COGNITO.CLIENT_SECRET
-  });
+  })
 
   try {
-    const userData = await auth.createUser(email);
+    const userData = await auth.createUser(email)
     if (userData?.metadata?.httpStatusCode === 200) {
-      logger.info('account created')
-      let passwordData;
+      logger.info("account created")
       if (userData?.sub) {
         logger.appendKeys({ sub: userData.sub })
-        passwordData = await auth.setPassword(email, password, true)
-        logger.info('password updated')
+        await auth.setPassword(email, password, true)
+        logger.info("password updated")
       }
 
       const response = {
@@ -121,8 +123,9 @@ export async function signUp(req: Request, res: Response): Promise<void> {
         sub: userData?.sub
       }
       successMessage(res, "user created", response)
-    } else {
-      logger.warn('unable to create user', { data: userData })
+    }
+    else {
+      logger.warn("unable to create user", { data: userData })
       const response = {
         requestId: userData?.metadata?.requestId
       }
@@ -133,7 +136,7 @@ export async function signUp(req: Request, res: Response): Promise<void> {
     logger.error("error at refresh", e as Error)
     errorMessage(`${e}`, res)
   }
-  logger.resetKeys();
+  logger.resetKeys()
 }
 
 export async function setPassword(req: Request, res: Response): Promise<void> {
@@ -144,16 +147,16 @@ export async function setPassword(req: Request, res: Response): Promise<void> {
     clientId: envs.COGNITO.CLIENT_ID,
     poolId: envs.COGNITO.POOL_ID,
     secret: envs.COGNITO.CLIENT_SECRET
-  });
+  })
 
   try {
-    const response = await auth.setPassword(email, password, true)
-    logger.info('password updated')
+    await auth.setPassword(email, password, true)
+    logger.info("password updated")
     successMessage(res, "password updated", {})
   }
   catch (e) {
     logger.error("error at refresh", e as Error)
     errorMessage(`${e}`, res)
   }
-  logger.resetKeys();
+  logger.resetKeys()
 }

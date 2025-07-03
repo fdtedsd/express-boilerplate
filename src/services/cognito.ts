@@ -1,17 +1,26 @@
-import { AdminConfirmSignUpCommand, AdminCreateUserCommand, AdminInitiateAuthCommand, AdminSetUserPasswordCommand, AuthFlowType, CognitoIdentityProviderClient, DeliveryMediumType, InitiateAuthCommandOutput, MessageActionType } from "@aws-sdk/client-cognito-identity-provider";
-import { createHmac } from "crypto";
-import { logger } from "../utils/logger";
+import { createHmac } from "crypto"
 
+import { instance } from "../utils/logger"
+
+import { AdminConfirmSignUpCommand, AdminCreateUserCommand, AdminCreateUserCommandOutput, AdminInitiateAuthCommand, AdminInitiateAuthCommandOutput, AdminSetUserPasswordCommand, AuthFlowType, CognitoIdentityProviderClient, DeliveryMediumType, InitiateAuthCommandOutput, MessageActionType } from "@aws-sdk/client-cognito-identity-provider"
+
+const logger = instance("Cognito Service")
+
+type AuthConfig = {
+  clientId: string
+  poolId: string
+  secret: string
+}
 export class Auth {
   client: CognitoIdentityProviderClient
   clientId: string
   poolId: string
   secret: string
 
-  constructor(config: any) {
-    this.client = new CognitoIdentityProviderClient();
-    this.clientId = config.clientId;
-    this.poolId = config.poolId;
+  constructor(config: AuthConfig) {
+    this.client = new CognitoIdentityProviderClient()
+    this.clientId = config.clientId
+    this.poolId = config.poolId
     this.secret = config.secret
   }
 
@@ -19,9 +28,9 @@ export class Auth {
     logger.info(`generating secret hash for ${username}, length: ${username.length}`)
     const hash = createHmac("sha256", clientSecret)
       .update(username + clientId)
-      .digest("base64");
+      .digest("base64")
     logger.info(`hash: ${hash}`)
-    return hash;
+    return hash
   }
 
   async signin(username: string, password: string) {
@@ -29,38 +38,36 @@ export class Auth {
       username,
       this.clientId,
       this.secret
-    );
+    )
 
     const input = {
       UserPoolId: this.poolId,
       AuthFlow: AuthFlowType.ADMIN_USER_PASSWORD_AUTH,
       AuthParameters: {
-        "PASSWORD": password,
-        "USERNAME": username,
-        "SECRET_HASH": secretHash
+        PASSWORD: password,
+        USERNAME: username,
+        SECRET_HASH: secretHash
       },
       ClientId: this.clientId
-    };
+    }
 
-    const command = new AdminInitiateAuthCommand(input);
+    const command = new AdminInitiateAuthCommand(input)
     try {
-      const response = await this.client.send(command);
-
-      console.log(response)
-
+      const response = await this.client.send(command)
       return {
         metadata: response.$metadata,
         hash: secretHash,
         result: response.AuthenticationResult
-      };
-    } catch (e) {
-      if ((e as any)?.name === "NotAuthorizedException") {
-        console.log(e)
+      }
+    }
+    catch (e) {
+      if ((e as Error)?.name === "NotAuthorizedException") {
+        logger.warn("NotAuthorizedException", e as Error)
         return {
-          metadata: (e as any)?.$metadata
+          metadata: (e as AdminInitiateAuthCommandOutput)?.$metadata
         }
       }
-      logger.error(e);
+      logger.error("error at signin", e as Error)
     }
   }
 
@@ -69,36 +76,31 @@ export class Auth {
       username,
       this.clientId,
       this.secret
-    );
-
-    console.log(secretHash, secretHash.length)
-    console.log(username, username.length)
-    console.log(token, token.length)
-    console.log('client', this.clientId)
-    console.log('pool', this.poolId)
+    )
 
     const input = {
       UserPoolId: this.poolId,
       AuthFlow: AuthFlowType.REFRESH_TOKEN,
       AuthParameters: {
-        "SECRET_HASH": secretHash,
-        "REFRESH_TOKEN": token,
+        SECRET_HASH: secretHash,
+        REFRESH_TOKEN: token
       },
       ClientId: this.clientId
-    };
+    }
 
-    const command = new AdminInitiateAuthCommand(input);
+    const command = new AdminInitiateAuthCommand(input)
     try {
-      const response = await this.client.send(command);
-      return response;
-    } catch (e) {
-      if ((e as any)?.name === "NotAuthorizedException") {
-        console.log(e)
+      const response = await this.client.send(command)
+      return response
+    }
+    catch (e) {
+      if ((e as Error)?.name === "NotAuthorizedException") {
+        logger.warn("NotAuthorizedException", e as Error)
         return {
-          $metadata: (e as any)?.$metadata
+          $metadata: (e as AdminInitiateAuthCommandOutput)?.$metadata
         } as InitiateAuthCommandOutput
       }
-      logger.error(e);
+      logger.error("error at refresh token", e as Error)
     }
   }
 
@@ -106,10 +108,10 @@ export class Auth {
     const input = {
       UserPoolId: this.poolId,
       Username: username
-    };
-    const command = new AdminConfirmSignUpCommand(input);
-    const response = await this.client.send(command);
-    return response;
+    }
+    const command = new AdminConfirmSignUpCommand(input)
+    const response = await this.client.send(command)
+    return response
   }
 
   async createUser(username: string) {
@@ -123,23 +125,24 @@ export class Auth {
         }
       ],
       MessageAction: MessageActionType.SUPPRESS,
-      DesiredDeliveryMediums: [DeliveryMediumType.EMAIL],
-    };
+      DesiredDeliveryMediums: [DeliveryMediumType.EMAIL]
+    }
     try {
-      const command = new AdminCreateUserCommand(input);
-      const response = await this.client.send(command);
+      const command = new AdminCreateUserCommand(input)
+      const response = await this.client.send(command)
       return {
         metadata: response.$metadata,
         sub: response.User?.Username
       }
-    } catch (e) {
-      if ((e as any)?.name === "UsernameExistsException") {
-        console.log(e)
+    }
+    catch (e) {
+      if ((e as Error)?.name === "UsernameExistsException") {
+        logger.warn("UsernameExistsException", e as Error)
         return {
-          metadata: (e as any)?.$metadata
+          metadata: (e as AdminCreateUserCommandOutput)?.$metadata
         }
       }
-      logger.error(e)
+      logger.error("error at createUser", e as Error)
     }
   }
 
@@ -149,10 +152,9 @@ export class Auth {
       Username: username,
       Password: password,
       Permanent: permanent
-    };
-    const command = new AdminSetUserPasswordCommand(input);
-    const response = await this.client.send(command);
-    return response;
+    }
+    const command = new AdminSetUserPasswordCommand(input)
+    const response = await this.client.send(command)
+    return response
   }
 }
-

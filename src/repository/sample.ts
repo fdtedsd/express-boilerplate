@@ -1,5 +1,7 @@
 import { db } from "../utils/db"
-import { logger } from "../utils/logger"
+import { instance } from "../utils/logger"
+
+const logger = instance("Sample Repository")
 
 type SampleDB = {
   id: string
@@ -8,7 +10,7 @@ type SampleDB = {
   updated_at: Date
 }
 
-type SampleResponse = {
+type SampleDTO = {
   id: string
   name: string
   createdAt: Date
@@ -21,7 +23,7 @@ export class SampleRepository {
     this.tableName = "myTable"
   }
 
-  static mapResponse(data?: SampleDB): SampleResponse | undefined {
+  static mapResponse(data?: SampleDB): SampleDTO | undefined {
     if (!data) {
       return undefined
     }
@@ -33,7 +35,7 @@ export class SampleRepository {
     }
   }
 
-  async getSampleById(id: string) {
+  async getById(id: string) {
     logger.info(`[SampleRepository] Fetching sample with ID: ${id}`)
     try {
       const result = await db(this.tableName)
