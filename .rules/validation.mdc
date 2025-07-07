@@ -1,0 +1,12 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Guidelines for data validation.
+
+- Validate body, query and parameters when applicable.
+- Use a validation middleware.
+- Do schema validation using zod or ajv.
+- If errors exists, return a 400 response with error details, do not forward to the controller.
+- When reviewing schema definitions, verify that all properties defined in the schema are actually used in the controller to avoid unnecessary validation overhead and potencial confusion.

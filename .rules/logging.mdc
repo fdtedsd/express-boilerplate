@@ -1,0 +1,14 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+Guideline for logging execution.
+
+- Logs should describe what has happened, not what is going to happen.
+- Log messages should be in the past tense.
+- Always use a logger function, avoid console.log.
+- Include relevant details like timestamp and IDs.
+- When possible, add log level (debug, info, warn, error).
+- Add the layer and function called in the log message.
+- Do not add Personal Identifiers into logs.
