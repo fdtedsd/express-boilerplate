@@ -10,6 +10,7 @@ type AuthConfig = {
   clientId: string
   poolId: string
   secret: string
+  region: string
 }
 export class Auth {
   client: CognitoIdentityProviderClient
@@ -18,7 +19,9 @@ export class Auth {
   secret: string
 
   constructor(config: AuthConfig) {
-    this.client = new CognitoIdentityProviderClient()
+    this.client = new CognitoIdentityProviderClient({
+      region: config.region
+    })
     this.clientId = config.clientId
     this.poolId = config.poolId
     this.secret = config.secret

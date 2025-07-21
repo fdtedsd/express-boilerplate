@@ -15,7 +15,8 @@ export async function refresh(req: Request, res: Response): Promise<void> {
   const auth = new Auth({
     clientId: envs.COGNITO.CLIENT_ID,
     poolId: envs.COGNITO.POOL_ID,
-    secret: envs.COGNITO.CLIENT_SECRET
+    secret: envs.COGNITO.CLIENT_SECRET,
+    region: envs.COGNITO.REGION
   })
 
   try {
@@ -52,7 +53,8 @@ export async function signIn(req: Request, res: Response): Promise<void> {
   const auth = new Auth({
     clientId: envs.COGNITO.CLIENT_ID,
     poolId: envs.COGNITO.POOL_ID,
-    secret: envs.COGNITO.CLIENT_SECRET
+    secret: envs.COGNITO.CLIENT_SECRET,
+    region: envs.COGNITO.REGION
   })
 
   try {
@@ -105,7 +107,8 @@ export async function signUp(req: Request, res: Response): Promise<void> {
   const auth = new Auth({
     clientId: envs.COGNITO.CLIENT_ID,
     poolId: envs.COGNITO.POOL_ID,
-    secret: envs.COGNITO.CLIENT_SECRET
+    secret: envs.COGNITO.CLIENT_SECRET,
+    region: envs.COGNITO.REGION
   })
 
   try {
@@ -146,7 +149,8 @@ export async function setPassword(req: Request, res: Response): Promise<void> {
   const auth = new Auth({
     clientId: envs.COGNITO.CLIENT_ID,
     poolId: envs.COGNITO.POOL_ID,
-    secret: envs.COGNITO.CLIENT_SECRET
+    secret: envs.COGNITO.CLIENT_SECRET,
+    region: envs.COGNITO.REGION
   })
 
   try {

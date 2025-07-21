@@ -15,7 +15,8 @@ export async function auth(req: AuthenticatedRequest, res: Response, next: NextF
   try {
     const authHeader = req.headers.authorization
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "Missing or invalid Authorization header" })
+      res.status(401).json({ message: "Missing or invalid Authorization header" })
+      return
     }
     const token = authHeader.replace("Bearer ", "")
 
@@ -34,6 +35,7 @@ export async function auth(req: AuthenticatedRequest, res: Response, next: NextF
   }
   catch (err) {
     const errorMessage = err instanceof Error ? err.message : String(err)
-    return res.status(401).json({ message: "Invalid or expired token", error: errorMessage })
+    res.status(401).json({ message: "Invalid or expired token", error: errorMessage })
+    return
   }
 };
