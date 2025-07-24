@@ -8,16 +8,17 @@ import { Auth } from "src/services/cognito"
 
 const logger = instance("Auth Controller")
 
+const auth = new Auth({
+  clientId: envs.COGNITO.CLIENT_ID,
+  poolId: envs.COGNITO.POOL_ID,
+  secret: envs.COGNITO.CLIENT_SECRET,
+  region: envs.COGNITO.REGION
+})
+
 export async function refresh(req: Request, res: Response): Promise<void> {
   logger.info("refresh called")
   const { sub, refreshToken } = req.body
   logger.appendKeys({ sub, refreshToken })
-  const auth = new Auth({
-    clientId: envs.COGNITO.CLIENT_ID,
-    poolId: envs.COGNITO.POOL_ID,
-    secret: envs.COGNITO.CLIENT_SECRET,
-    region: envs.COGNITO.REGION
-  })
 
   try {
     const data = await auth.refreshToken(sub, refreshToken)
@@ -50,12 +51,6 @@ export async function signIn(req: Request, res: Response): Promise<void> {
   logger.info("signIn called")
   const { username, password } = req.body
   logger.appendKeys({ username })
-  const auth = new Auth({
-    clientId: envs.COGNITO.CLIENT_ID,
-    poolId: envs.COGNITO.POOL_ID,
-    secret: envs.COGNITO.CLIENT_SECRET,
-    region: envs.COGNITO.REGION
-  })
 
   try {
     const data = await auth.signin(username, password)
@@ -104,12 +99,6 @@ export async function signUp(req: Request, res: Response): Promise<void> {
   logger.info("signUp called")
   const { email, password } = req.body
   logger.appendKeys({ email })
-  const auth = new Auth({
-    clientId: envs.COGNITO.CLIENT_ID,
-    poolId: envs.COGNITO.POOL_ID,
-    secret: envs.COGNITO.CLIENT_SECRET,
-    region: envs.COGNITO.REGION
-  })
 
   try {
     const userData = await auth.createUser(email)
@@ -146,12 +135,6 @@ export async function setPassword(req: Request, res: Response): Promise<void> {
   logger.info("setPassword called")
   const { email, password } = req.body
   logger.appendKeys({ email })
-  const auth = new Auth({
-    clientId: envs.COGNITO.CLIENT_ID,
-    poolId: envs.COGNITO.POOL_ID,
-    secret: envs.COGNITO.CLIENT_SECRET,
-    region: envs.COGNITO.REGION
-  })
 
   try {
     await auth.setPassword(email, password, true)
