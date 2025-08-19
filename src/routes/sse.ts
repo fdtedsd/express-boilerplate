@@ -1,12 +1,14 @@
 import { type Request, type Response, Router } from "express"
 import { instance as createLogger } from "../utils/logger"
 import { validateBroadcastBody, validateSendRequest } from "../validation/sse"
+import { envs } from "src/config/env"
 
 const router = Router()
 const logger = createLogger("routes.sse")
 
 const connections = new Map<string, Response>()
-const HEARTBEAT_INTERVAL_MS = 30000 //30seg
+const heartbeatInterval = envs.HEARTBEAT_INTERVAL_MS
+
 
 
 const generateConnectionId = (): string => {
@@ -53,7 +55,7 @@ router.get("/sse/connect", (req: Request, res: Response) => {
     } else {
       clearInterval(heartbeat)
     }
-  }, HEARTBEAT_INTERVAL_MS)
+  }, heartbeatInterval)
 
   logger.info("SSE connection established", { connectionId })
 })

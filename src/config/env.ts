@@ -14,5 +14,6 @@ export const envs = {
   KNEX_ENV: process.env.KNEX_ENV ?? "local",
   ECS: {
     TASK_ID: process.env.ECS_TASK_ID
-  }
+  },
+  HEARTBEAT_INTERVAL_MS: parseInt(process.env.HEARTBEAT_INTERVAL_MS ?? "30000", 10),
 }
