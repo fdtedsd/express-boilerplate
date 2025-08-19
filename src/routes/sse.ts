@@ -1,8 +1,12 @@
-import { Router, Request, Response } from "express"
+import { type Request, type Response, Router } from "express"
+import { instance as createLogger } from "../utils/logger"
+import { validateBroadcastBody, validateSendRequest } from "../validation/sse"
 
 const router = Router()
+const logger = createLogger("routes.sse")
 
 const connections = new Map<string, Response>()
+const HEARTBEAT_INTERVAL_MS = 30000 //30seg
 
 
 const generateConnectionId = (): string => {
@@ -37,7 +41,7 @@ router.get("/sse/connect", (req: Request, res: Response) => {
   req.on("close", () => {
     connections.delete(connectionId)
     try { clearInterval(heartbeat) } catch { }
-    console.log(`Client disconnected: ${connectionId}`)
+    logger.info("Client disconnected", { connectionId })
   })
 
   const heartbeat = setInterval(() => {
@@ -49,17 +53,13 @@ router.get("/sse/connect", (req: Request, res: Response) => {
     } else {
       clearInterval(heartbeat)
     }
-  }, 30000) // 30 sec
+  }, HEARTBEAT_INTERVAL_MS)
 
-  console.log(`New SSE connection established: ${connectionId}`)
+  logger.info("SSE connection established", { connectionId })
 })
 
-router.post("/sse/broadcast", (req: Request, res: Response) => {
-  const { message, type = "notification" } = req.body
-
-  if (!message) {
-    return res.status(400).json({ error: "Message is required" })
-  }
+router.post("/sse/broadcast", validateBroadcastBody, (req: Request, res: Response) => {
+  const { message, type = "notification" } = req.body as { message: string, type?: string }
 
   const data = {
     type,
@@ -71,29 +71,25 @@ router.post("/sse/broadcast", (req: Request, res: Response) => {
     try {
       clientRes.write(`data: ${JSON.stringify(data)}\n\n`)
     } catch (error) {
-      console.error(`Error sending to client ${connectionId}:`, error)
+      logger.error("Error sending to client", { connectionId, error })
       connections.delete(connectionId)
     }
   })
 
-  res.json({
+  res.status(200).json({
     success: true,
     message: "Broadcast sent",
     activeConnections: connections.size
   })
 })
 
-router.post("/sse/send/:connectionId", (req: Request, res: Response) => {
-  const { connectionId } = req.params
-  const { message, type = "notification" } = req.body
-
-  if (!message) {
-    return res.status(400).json({ error: "Message is required" })
-  }
+router.post("/sse/send/:connectionId", validateSendRequest, (req: Request, res: Response) => {
+  const { connectionId } = req.params as { connectionId: string }
+  const { message, type = "notification" } = req.body as { message: string, type?: string }
 
   const clientRes = connections.get(connectionId)
   if (!clientRes) {
-    return res.status(404).json({ error: "Connection not found" })
+    return res.status(422).json({ error: { message: "Connection not found" } })
   }
 
   const data = {
@@ -104,11 +100,11 @@ router.post("/sse/send/:connectionId", (req: Request, res: Response) => {
 
   try {
     clientRes.write(`data: ${JSON.stringify(data)}\n\n`)
-    res.json({ success: true, message: "Message sent" })
+    res.status(200).json({ success: true, message: "Message sent" })
   } catch (error) {
-    console.error(`Error sending to client ${connectionId}:`, error)
+    logger.error("Failed to send message to client", { connectionId, error })
     connections.delete(connectionId)
-    res.status(500).json({ error: "Failed to send message" })
+    res.status(500).json({ error: { message: "Failed to send message" } })
   }
 })
 
@@ -118,7 +114,7 @@ router.get("/sse/connections", (req: Request, res: Response) => {
     connectedAt: new Date().toISOString()
   }))
 
-  res.json({
+  res.status(200).json({
     activeConnections: connections.size,
     connections: connectionInfo
   })
