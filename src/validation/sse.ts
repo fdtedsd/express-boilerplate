@@ -1,49 +1,40 @@
-import { type NextFunction, type Request, type Response } from "express"
-import { z } from "zod"
+import { default as mapValidator } from "../validation/validator"
+import { type InputSchemaMap } from "../validation/validator"
+import { z } from "zod/v4"
 
 const broadcastBodySchema = z.object({
-    message: z.string().min(1, "Message must not be empty"),
-    type: z.string().optional()
+  message: z.string().min(1, "Message must not be empty"),
+  type: z.string().optional()
 })
 
 const sendBodySchema = z.object({
-    message: z.string().min(1, "Message must not be empty"),
-    type: z.string().optional()
+  message: z.string().min(1, "Message must not be empty"),
+  type: z.string().optional()
 })
 
 const connectionIdParamsSchema = z.object({
-    connectionId: z.string().min(1, "ConnectionId is required")
+  connectionId: z.string().min(1, "ConnectionId is required")
 })
 
-export function validateBroadcastBody(req: Request, res: Response, next: NextFunction): void {
-    try {
-        broadcastBodySchema.parse(req.body)
-        next()
+export const inputSchemaMap = {
+  sendBroadcast: [
+    {
+      schema: broadcastBodySchema,
+      property: "body"
     }
-    catch (error) {
-        if (error instanceof z.ZodError) {
-            res.status(400).send({ error: error.issues })
-        }
-        else {
-            res.status(500).send({ error: { message: "Unexpected error validating broadcast body." } })
-        }
+  ],
+  sendToId: [
+    {
+      schema: connectionIdParamsSchema,
+      property: "params"
+    },
+    {
+      schema: sendBodySchema,
+      property: "body"
     }
-}
+  ]
+} as InputSchemaMap
 
-export function validateSendRequest(req: Request, res: Response, next: NextFunction): void {
-    try {
-        connectionIdParamsSchema.parse(req.params)
-        sendBodySchema.parse(req.body)
-        next()
-    }
-    catch (error) {
-        if (error instanceof z.ZodError) {
-            res.status(400).send({ error: error.issues })
-        }
-        else {
-            res.status(500).send({ error: { message: "Unexpected error validating send request." } })
-        }
-    }
-}
+export const validate = mapValidator(inputSchemaMap)
 
 
