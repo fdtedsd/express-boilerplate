@@ -1,6 +1,5 @@
 import { type Request, type Response, Router } from "express"
 import { instance as createLogger } from "../utils/logger"
-import { validate } from "../validation/sse"
 import { ValidatedRequest } from "../types/express"
 import { envs } from "../config/env"
 import type { BroadcastBody, ConnectionIdParams, HeartbeatEvent, NotificationEvent, SSEConnections, SSEServerEvent } from "../types/sse"
@@ -70,18 +69,7 @@ export function getConnection(req: Request, res: Response): void {
 
 export function sendBroadcast(req: ValidatedRequest<BroadcastBody>, res: Response): void {
   try {
-    if (!req.input) {
-      logger.warn("Broadcast request rejected: Invalid request data", { 
-        body: req.body,
-        headers: req.headers 
-      })
-      res.status(400).json({ 
-        error: { message: "Invalid request data" } 
-      })
-      return
-    }
-
-    const { message, type = "notification" } = req.input
+    const { message, type = "notification" } = req.input as BroadcastBody
     logger.info("Processing broadcast request", { message, type, activeConnections: connections.size })
 
     const data: NotificationEvent = {
@@ -130,18 +118,7 @@ export function sendBroadcast(req: ValidatedRequest<BroadcastBody>, res: Respons
 
 export function sendToId(req: ValidatedRequest<ConnectionIdParams & BroadcastBody>, res: Response): Response {
   try {
-    if (!req.input) {
-      logger.warn("Send to ID request rejected: Invalid request data", { 
-        body: req.body,
-        params: req.params,
-        headers: req.headers 
-      })
-      return res.status(400).json({ 
-        error: { message: "Invalid request data" } 
-      })
-    }
-
-    const { connectionId, message, type = "notification" } = req.input
+    const { connectionId, message, type = "notification" } = req.input as ConnectionIdParams & BroadcastBody
     logger.info("Processing send to ID request", { connectionId, message, type })
 
     const clientRes = connections.get(connectionId)
