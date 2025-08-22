@@ -1,7 +1,6 @@
 import { SampleRepository } from "@/repository/sample"
 import { instance } from "@/utils/logger"
 import { errorMessage, successMessage } from "@/utils/response"
-
 import type { Request, Response } from "express"
 
 const logger = instance("controller.sample")
