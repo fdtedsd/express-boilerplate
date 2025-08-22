@@ -1,5 +1,5 @@
-import { getSampleById } from "../controllers/sample"
-import { validateId } from "../validation/sample"
+import { getSampleById } from "@/controllers/sample"
+import { validateId } from "@/validation/sample"
 
 import { Router } from "express"
 

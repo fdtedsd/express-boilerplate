@@ -12,8 +12,5 @@ export const envs = {
   APP_PORT: parseInt(process.env.APP_PORT ?? "3000", 10),
   APP_NAME: process.env.APP_NAME ?? "my-app",
   KNEX_ENV: process.env.KNEX_ENV ?? "local",
-  ECS: {
-    TASK_ID: process.env.ECS_TASK_ID
-  },
   HEARTBEAT_INTERVAL_MS: parseInt(process.env.HEARTBEAT_INTERVAL_MS ?? "30000", 10)
 }

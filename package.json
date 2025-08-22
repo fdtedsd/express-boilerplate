@@ -11,16 +11,18 @@
     "get-version": "echo $npm_package_version",
     "lint": "npx eslint \"**/*.ts\" --ignore-pattern node_modules/ --fix",
     "prebuild": "node -p \"'export const PACKAGE_VERSION = ' + JSON.stringify(require('./package.json').version)\" > src/version.ts",
-    "build": "tsc",
-    "start": "npx pm2 start dist/index.js"
+    "build": "tsc && tsc-alias",
+    "start": "node dist/index.js"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "5.2.3",
+    "@types/compression": "1.8.1",
     "@types/cors": "2.8.19",
     "@types/express": "5.0.3",
     "@types/node": "24.3.0",
     "eslint": "9.33.0",
     "eslint-plugin-simple-import-sort": "12.1.1",
+    "tsc-alias": "1.8.16",
     "tsconfig-paths": "4.2.0",
     "typescript": "5.9.2",
     "typescript-eslint": "8.40.0"
@@ -28,12 +30,12 @@
   "dependencies": {
     "@aws-lambda-powertools/logger": "2.25.1",
     "axios": "1.11.0",
+    "compression": "1.8.1",
     "cors": "2.8.5",
     "dotenv": "17.2.1",
     "express": "5.1.0",
     "knex": "3.1.0",
     "pg": "8.16.3",
-    "pm2": "6.0.8",
     "uuid": "11.1.0",
     "zod": "4.0.17"
   }

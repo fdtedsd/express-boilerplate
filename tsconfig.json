@@ -2,6 +2,29 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
+    "paths": {
+      "@/controllers/*": [
+        "src/controllers/*"
+      ],
+      "@/repository/*": [
+        "src/repository/*"
+      ],
+      "@/utils/*": [
+        "src/utils/*"
+      ],
+      "@/types/*": [
+        "src/types/*"
+      ],
+      "@/config/*": [
+        "src/config/*"
+      ],
+      "@/middlewares/*": [
+        "src/middlewares/*"
+      ],
+      "@/validation/*": [
+        "src/validation/*"
+      ]
+    },
     "esModuleInterop": true, /* Ensure that casing is correct in imports. */
     "forceConsistentCasingInFileNames": true,
     "module": "commonjs",
@@ -17,8 +40,25 @@
       "node",
       "express"
     ],
+    "lib": [
+      "es2020"
+    ],
+    "typeRoots": [
+      "./src/types",
+      "./node_modules/@types"
+    ],
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*"
-  ]
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "ts-node": {
+    "require": [
+      "tsconfig-paths/register"
+    ]
+  }
 }
