@@ -1,40 +1,41 @@
-import { default as mapValidator } from "../validation/validator"
-import { type InputSchemaMap } from "../validation/validator"
-import { z } from "zod/v4"
+import type { RequestProperty } from "../types/vatidation"
+import { handler } from "../validation"
 
-const broadcastBodySchema = z.object({
-  message: z.string().min(1, "Message must not be empty"),
+import { z } from "zod"
+
+export const broadcastSchema = z.object({
+  content: z.string().min(1, "Message must not be empty"),
   type: z.string().optional()
 })
 
-const sendBodySchema = z.object({
-  message: z.string().min(1, "Message must not be empty"),
+export const messageSchema = z.object({
+  content: z.string().min(1, "Message must not be empty"),
   type: z.string().optional()
 })
 
-const connectionIdParamsSchema = z.object({
+export const connectionIdSchema = z.object({
   connectionId: z.string().min(1, "ConnectionId is required")
 })
 
 export const inputSchemaMap = {
-  sendBroadcast: [
+  broadcast: [
     {
-      schema: broadcastBodySchema,
-      property: "body"
+      schema: broadcastSchema,
+      property: "body" as RequestProperty
     }
   ],
-  sendToId: [
+  sendToConnection: [
     {
-      schema: connectionIdParamsSchema,
-      property: "params"
+      schema: connectionIdSchema,
+      property: "params" as RequestProperty
     },
     {
-      schema: sendBodySchema,
-      property: "body"
+      schema: messageSchema,
+      property: "body" as RequestProperty
     }
   ]
-} as InputSchemaMap
+}
 
-export const validate = mapValidator(inputSchemaMap)
-
-
+export function validate(schema: keyof typeof inputSchemaMap) {
+  return handler(inputSchemaMap[schema])
+}

@@ -1,15 +1,11 @@
+import { broadcastSchema, connectionIdSchema } from "../validation/sse"
+
 import type { Response } from "express"
+import { z } from "zod"
 
-export type BroadcastBody = {
-  message: string
-  type?: string
-}
-
-export type SendBody = BroadcastBody
-
-export type ConnectionIdParams = {
-  connectionId: string
-}
+export type BroadcastInput = z.infer<typeof broadcastSchema>
+export type ConnectionId = z.infer<typeof connectionIdSchema>
+export type MessageInput = BroadcastInput & ConnectionId
 
 export type ConnectedEvent = {
   type: "connected"
@@ -25,12 +21,10 @@ export type HeartbeatEvent = {
 
 export type NotificationEvent = {
   type: string
-  message: string
+  content: string
   timestamp: string
 }
 
 export type SSEServerEvent = ConnectedEvent | HeartbeatEvent | NotificationEvent
 
 export type SSEConnections = Map<string, Response>
-
-

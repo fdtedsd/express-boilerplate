@@ -1,17 +1,10 @@
 import type { ValidatedRequest } from "../types/express"
+import { InputSchema } from "../types/vatidation"
 
 import type { NextFunction, Response } from "express"
-import { z } from "zod/v4"
+import { z } from "zod"
 
-export type RequestProperty = "body" | "params" | "query"
-
-export type InputSchema = {
-  schema: z.ZodObject
-  property: RequestProperty
-}
-export type InputSchemaMap = Record<string, InputSchema[]>
-
-function handler<T>(inputSchemas: InputSchema[]) {
+export function handler<T>(inputSchemas: InputSchema[]) {
   return function (req: ValidatedRequest<T>, res: Response, next: NextFunction): void {
     try {
       let input = {}
@@ -35,11 +28,5 @@ function handler<T>(inputSchemas: InputSchema[]) {
         return
       }
     }
-  }
-}
-
-export default function map(inputSchemaMap: InputSchemaMap) {
-  return function (name: keyof InputSchemaMap) {
-    return handler(inputSchemaMap[name])
   }
 }
