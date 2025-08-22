@@ -1,7 +1,6 @@
 import { createHmac } from "crypto"
 
-import { instance } from "../utils/logger"
-
+import { instance } from "@/utils/logger"
 import { AdminConfirmSignUpCommand, AdminCreateUserCommand, AdminCreateUserCommandOutput, AdminInitiateAuthCommand, AdminInitiateAuthCommandOutput, AdminSetUserPasswordCommand, AuthFlowType, CognitoIdentityProviderClient, DeliveryMediumType, InitiateAuthCommandOutput, MessageActionType } from "@aws-sdk/client-cognito-identity-provider"
 
 const logger = instance("Cognito Service")

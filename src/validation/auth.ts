@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express"
-import { z } from "zod/v4"
+import { z } from "zod"
 
 const signInSchema = z.object({
   username: z.email(),

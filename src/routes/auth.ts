@@ -1,6 +1,5 @@
-import { refresh, signIn, signUp } from "../controllers/auth"
-import { validateRefresh, validateSignIn } from "../validation/auth"
-
+import { refresh, signIn, signUp } from "@/controllers/auth"
+import { validateRefresh, validateSignIn } from "@/validation/auth"
 import { Router } from "express"
 
 const router = Router()

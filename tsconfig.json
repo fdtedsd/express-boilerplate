@@ -23,6 +23,9 @@
       ],
       "@/validation/*": [
         "src/validation/*"
+      ],
+      "@/services/*": [
+        "src/services/*"
       ]
     },
     "esModuleInterop": true, /* Ensure that casing is correct in imports. */

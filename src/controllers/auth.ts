@@ -1,12 +1,11 @@
-import { envs } from "../config/env"
-import { instance } from "../utils/logger"
-import { conflictMessage, errorMessage, successMessage, unauthorizedMessage } from "../utils/response"
-
+import { envs } from "@/config/env"
+import { Auth } from "@/services/cognito"
+import { instance } from "@/utils/logger"
+import { conflictMessage, errorMessage, successMessage, unauthorizedMessage } from "@/utils/response"
 import { type Request, type Response } from "express"
 import jwt from "jsonwebtoken"
-import { Auth } from "src/services/cognito"
 
-const logger = instance("Auth Controller")
+const logger = instance("controller.auth")
 
 const auth = new Auth({
   clientId: envs.COGNITO.CLIENT_ID,

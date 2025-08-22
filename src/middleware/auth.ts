@@ -1,7 +1,6 @@
 // middlewares/auth.js
-import { envs } from "../config/env"
-import type { AuthenticatedRequest } from "../types/express"
-
+import { envs } from "@/config/env"
+import type { AuthenticatedRequest } from "@/types/express"
 import { CognitoJwtVerifier } from "aws-jwt-verify"
 import type { NextFunction, Response } from "express"
 
