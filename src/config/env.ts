@@ -15,5 +15,5 @@ export const envs = {
   ECS: {
     TASK_ID: process.env.ECS_TASK_ID
   },
-  HEARTBEAT_INTERVAL_MS: parseInt(process.env.HEARTBEAT_INTERVAL_MS ?? "30000", 10),
+  HEARTBEAT_INTERVAL_MS: parseInt(process.env.HEARTBEAT_INTERVAL_MS ?? "30000", 10)
 }
