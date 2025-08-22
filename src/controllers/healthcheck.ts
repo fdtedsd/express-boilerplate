@@ -1,6 +1,6 @@
-import { instance } from "@/utils/logger"
 import { PACKAGE_VERSION } from "../version"
 
+import { instance } from "@/utils/logger"
 import { NextFunction, Request, Response } from "express"
 
 const logger = instance("controller.healthcheck")

@@ -1,5 +1,4 @@
-import { broadcastSchema, connectionIdSchema } from "../validation/sse"
-
+import { broadcastSchema, connectionIdSchema } from "@/validation/sse"
 import type { Response } from "express"
 import { z } from "zod"
 

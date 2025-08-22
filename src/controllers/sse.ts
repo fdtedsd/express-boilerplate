@@ -1,7 +1,7 @@
-import { envs } from "../config/env"
-import { Response, ValidatedRequest } from "../types/express"
-import type { BroadcastInput, HeartbeatEvent, MessageInput, NotificationEvent, SSEConnections, SSEServerEvent } from "../types/sse"
-import { instance as createLogger } from "../utils/logger"
+import { envs } from "@/config/env"
+import { Response, ValidatedRequest } from "@/types/express"
+import type { BroadcastInput, HeartbeatEvent, MessageInput, NotificationEvent, SSEConnections, SSEServerEvent } from "@/types/sse"
+import { instance as createLogger } from "@/utils/logger"
 
 const logger = createLogger("controllers.sse")
 

@@ -1,5 +1,4 @@
-import { health } from "../controllers/healthcheck"
-
+import { health } from "@/controllers/healthcheck"
 import { Router } from "express"
 
 const router = Router()

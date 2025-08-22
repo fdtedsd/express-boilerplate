@@ -1,5 +1,4 @@
 import { envs } from "@/config/env"
-
 import { Logger } from "@aws-lambda-powertools/logger"
 
 export const instance = (layer: string) => {

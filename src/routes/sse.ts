@@ -1,6 +1,5 @@
-import { broadcast, connect, listActiveConnection, messageConnection } from "../controllers/sse"
-import { validate } from "../validation/sse"
-
+import { broadcast, connect, listActiveConnection, messageConnection } from "@/controllers/sse"
+import { validate } from "@/validation/sse"
 import { Router } from "express"
 
 const router = Router()
