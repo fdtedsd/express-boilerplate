@@ -1,8 +1,9 @@
 import { envs } from "@/config/env"
 import { Auth } from "@/services/cognito"
+import type { AuthenticatedRequest } from "@/types/express"
 import { instance } from "@/utils/logger"
 import { conflictMessage, errorMessage, successMessage, unauthorizedMessage } from "@/utils/response"
-import { type Request, type Response } from "express"
+import type { Request, Response } from "express"
 import jwt from "jsonwebtoken"
 
 const logger = instance("controller.auth")
@@ -43,7 +44,9 @@ export async function refresh(req: Request, res: Response): Promise<void> {
     logger.error("error at refresh", e as Error)
     errorMessage(`${e}`, res)
   }
-  logger.resetKeys()
+  finally {
+    logger.resetKeys()
+  }
 }
 
 export async function signIn(req: Request, res: Response): Promise<void> {
@@ -91,7 +94,9 @@ export async function signIn(req: Request, res: Response): Promise<void> {
     logger.error("error at refresh", e as Error)
     errorMessage(`${e}`, res)
   }
-  logger.resetKeys()
+  finally {
+    logger.resetKeys()
+  }
 }
 
 export async function signUp(req: Request, res: Response): Promise<void> {
@@ -127,7 +132,9 @@ export async function signUp(req: Request, res: Response): Promise<void> {
     logger.error("error at refresh", e as Error)
     errorMessage(`${e}`, res)
   }
-  logger.resetKeys()
+  finally {
+    logger.resetKeys()
+  }
 }
 
 export async function setPassword(req: Request, res: Response): Promise<void> {
@@ -144,5 +151,159 @@ export async function setPassword(req: Request, res: Response): Promise<void> {
     logger.error("error at refresh", e as Error)
     errorMessage(`${e}`, res)
   }
-  logger.resetKeys()
+  finally {
+    logger.resetKeys()
+  }
+}
+
+export async function forgotPassword(req: Request, res: Response): Promise<void> {
+  const { username } = req.body
+  logger.appendKeys({ username })
+  logger.info("forgotPassword called")
+
+  try {
+    const result = await auth.forgotPassword(username)
+
+    if (!result.success) {
+      logger.warn("forgotPassword failed", {
+        error: result.error,
+        requestId: result?.metadata?.requestId,
+        result
+      })
+
+      if (result.error === "Invalid parameters") {
+        successMessage(res, "Invalid parameters", {
+          requestId: result?.metadata?.requestId
+        })
+        return
+      }
+    }
+
+    successMessage(res, "Request processed", {
+      requestId: result?.metadata?.requestId
+    })
+  }
+  catch (e) {
+    logger.error("error at forgotPassword", e as Error)
+    successMessage(res, "Request processed", {
+      requestId: null
+    })
+  }
+  finally {
+    logger.resetKeys()
+  }
+}
+
+export async function resendConfirmationCode(req: Request, res: Response): Promise<void> {
+  const { username } = req.body
+  logger.appendKeys({ username })
+  logger.info("resendConfirmationCode called")
+
+  try {
+    const result = await auth.resendConfirmationCode(username)
+
+    if (!result.success) {
+      logger.warn("resendConfirmationCode failed", {
+        error: result.error,
+        requestId: result?.metadata?.requestId,
+        result
+      })
+
+      if (result.error === "Invalid parameters") {
+        successMessage(res, "Invalid parameters", {
+          requestId: result?.metadata?.requestId
+        })
+        return
+      }
+    }
+
+    successMessage(res, "Request processed", {
+      requestId: result?.metadata?.requestId
+    })
+  }
+  catch (e) {
+    logger.error("error at resendConfirmationCode", e as Error)
+    successMessage(res, "Request processed", {
+      requestId: null
+    })
+  }
+  finally {
+    logger.resetKeys()
+  }
+}
+
+export async function resetPassword(req: Request, res: Response): Promise<void> {
+  const { username, confirmationCode, newPassword } = req.body
+  logger.appendKeys({ username })
+  logger.info("resetPassword called")
+
+  try {
+    const response = await auth.resetPassword(username, confirmationCode, newPassword)
+
+    if (!response.success) {
+      logger.warn("resetPassword failed", {
+        error: response.error,
+        requestId: response?.metadata?.requestId,
+        response
+      })
+
+      if (response.error === "Invalid confirmation code") {
+        successMessage(res, "Invalid confirmation code", {
+          requestId: response?.metadata?.requestId
+        })
+        return
+      }
+      if (response.error === "Confirmation code has expired") {
+        successMessage(res, "Confirmation code has expired", {
+          requestId: response?.metadata?.requestId
+        })
+        return
+      }
+    }
+
+    successMessage(res, "Request processed", {
+      requestId: response?.metadata?.requestId
+    })
+  }
+  catch (error) {
+    logger.error("error at resetPassword", error as Error)
+    successMessage(res, "Request processed", {
+      requestId: null
+    })
+  }
+  finally {
+    logger.resetKeys()
+  }
+}
+
+export async function changePassword(req: AuthenticatedRequest, res: Response): Promise<void> {
+  const { previousPassword, proposedPassword } = req.body
+  logger.info("changePassword called")
+  const accessToken = req.headers.authorization!.replace("Bearer ", "")
+
+  try {
+    const data = await auth.changePassword(accessToken, previousPassword, proposedPassword)
+
+    if (data?.success) {
+      logger.info("password changed successfully")
+      successMessage(res, "password changed", {
+        requestId: data?.metadata?.requestId
+      })
+    }
+    else {
+      logger.warn("unable to change password", { data })
+      const response = {
+        requestId: data?.metadata?.requestId,
+        error: data?.error
+      }
+      unauthorizedMessage(res, data?.error || "unable to change password", response)
+    }
+  }
+  catch (e) {
+    logger.error("error at changePassword", e as Error)
+    errorMessage(`${e}`, res)
+  }
+  finally {
+    logger.resetKeys()
+  }
 }
