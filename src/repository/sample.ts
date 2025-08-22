@@ -1,5 +1,7 @@
-import { db } from "../utils/db"
-import { logger } from "../utils/logger"
+import { db } from "@/utils/db"
+import { instance } from "@/utils/logger"
+
+const logger = instance("repository.sample")
 
 type SampleDB = {
   id: string
@@ -34,7 +36,8 @@ export class SampleRepository {
   }
 
   async getSampleById(id: string) {
-    logger.info(`[SampleRepository] Fetching sample with ID: ${id}`)
+    logger.appendKeys({ id })
+    logger.info("getSampleById called")
     try {
       const result = await db(this.tableName)
         .select("*")
@@ -44,8 +47,11 @@ export class SampleRepository {
       return SampleRepository.mapResponse(result)
     }
     catch (error) {
-      logger.error(`[SampleRepository] Error fetching sample with ID ${id}: ${error}`)
+      logger.error("error fetching sample", { error })
       throw error
+    }
+    finally {
+      logger.resetKeys()
     }
   }
 }

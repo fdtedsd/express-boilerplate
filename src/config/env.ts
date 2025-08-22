@@ -11,8 +11,5 @@ export const envs = {
   LOG_LEVEL: (process.env.LOG_LEVEL ?? "INFO") as LogLevel,
   APP_PORT: parseInt(process.env.APP_PORT ?? "3000", 10),
   APP_NAME: process.env.APP_NAME ?? "my-app",
-  KNEX_ENV: process.env.KNEX_ENV ?? "local",
-  ECS: {
-    TASK_ID: process.env.ECS_TASK_ID
-  }
+  KNEX_ENV: process.env.KNEX_ENV ?? "local"
 }
