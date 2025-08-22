@@ -13,13 +13,13 @@ export async function getSampleById(req: Request, res: Response): Promise<void> 
   logger.appendKeys({ id })
   try {
     const data = await repo.getSampleById(id)
-    logger.info('data fetched')
+    logger.info("data fetched")
     successMessage(res, "sample fetched successfully", data)
-    logger.resetKeys();
+    logger.resetKeys()
   }
   catch (e) {
     logger.error("error at getSampleById", e as Error)
     errorMessage(`${e}`, res)
-    logger.resetKeys();
+    logger.resetKeys()
   }
 }
