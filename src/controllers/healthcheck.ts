@@ -1,9 +1,9 @@
-import { instance } from "../utils/logger"
 import { PACKAGE_VERSION } from "../version"
 
+import { instance } from "@/utils/logger"
 import { NextFunction, Request, Response } from "express"
 
-const logger = instance("Controller")
+const logger = instance("controller.healthcheck")
 
 export function health(req: Request, res: Response, next: NextFunction): void {
   logger.info("health called")

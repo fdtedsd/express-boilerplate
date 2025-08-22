@@ -17,8 +17,5 @@ export const envs = {
     CLIENT_ID: process.env.COGNITO_CLIENT_ID ?? "",
     CLIENT_SECRET: process.env.COGNITO_CLIENT_SECRET ?? "",
     REGION: process.env.COGNITO_REGION ?? "us-east-1"
-  },
-  ECS: {
-    TASK_ID: process.env.ECS_TASK_ID
   }
 }

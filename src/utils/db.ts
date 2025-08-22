@@ -1,5 +1,4 @@
-import { envs } from "../config/env"
-
+import { envs } from "@/config/env"
 import knex, { Knex } from "knex"
 
 export const knexConfig: { [key: string]: Knex.Config } = {

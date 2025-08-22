@@ -1,0 +1,16 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Use a mapper function to translate between the persistence models (entities) and the API/data transfer models (DTOs).
+
+When importing types, always explicit declare as a type (e.g. import { type GetLocation } from 'xxx')
+
+Persistence Model Types
+- Use snake_case
+- Use null types for undefined values.
+
+DTO
+- Use camelCase.
+- Avoid null types, prefer undefined.
