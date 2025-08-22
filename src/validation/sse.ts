@@ -1,5 +1,6 @@
-import type { RequestProperty } from "@/types/vatidation"
-import { handler } from "@/validation"
+import { handler } from "../validation"
+
+import type { RequestProperty } from "@/types/validation"
 import { z } from "zod"
 
 export const broadcastSchema = z.object({

@@ -1,5 +1,5 @@
 import type { ValidatedRequest } from "@/types/express"
-import { InputSchema } from "@/types/vatidation"
+import { InputSchema } from "@/types/validation"
 import type { NextFunction, Response } from "express"
 import { z } from "zod"
 
