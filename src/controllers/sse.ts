@@ -26,14 +26,19 @@ export function connect(req: ValidatedRequest, res: Response): void {
     const connectionId = generateConnectionId()
     connections.set(connectionId, res)
 
+    // Headers para SSE e CORS local
     res.writeHead(200, {
       "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache",
+      "Cache-Control": "no-cache, no-store, must-revalidate",
       "Connection": "keep-alive",
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "Cache-Control"
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Cache-Control, Content-Type, Authorization",
+      "Access-Control-Allow-Credentials": "true",
+      "X-Accel-Buffering": "no" // Desabilita buffering no nginx se estiver sendo usado
     })
 
+    // Envia evento de conexão estabelecida
     const connectedEvent: SSEServerEvent = {
       type: "connected",
       connectionId,
@@ -41,17 +46,27 @@ export function connect(req: ValidatedRequest, res: Response): void {
       timestamp: new Date().toISOString()
     }
 
-    res.write(`data: ${JSON.stringify(connectedEvent)}\n`)
+    res.write(`data: ${JSON.stringify(connectedEvent)}\n\n`)
+    res.flush?.() // Força o envio imediato (se disponível)
     logger.info("connection established", { connectionId })
 
+    // Configura heartbeat
     const heartbeat = setInterval(() => {
       if (connections.has(connectionId)) {
-        const heartbeatEvent: HeartbeatEvent = {
-          type: "heartbeat",
-          timestamp: new Date().toISOString()
+        try {
+          const heartbeatEvent: HeartbeatEvent = {
+            type: "heartbeat",
+            timestamp: new Date().toISOString()
+          }
+          res.write(`data: ${JSON.stringify(heartbeatEvent)}\n\n`)
+          res.flush?.() // Força o envio imediato
+          logger.debug("heartbeat sent", { connectionId })
         }
-        res.write(`data: ${JSON.stringify(heartbeatEvent)}\n`)
-        logger.info("heartbeat", { connectionId })
+        catch (error) {
+          logger.error("error sending heartbeat", { connectionId, error })
+          clearInterval(heartbeat)
+          connections.delete(connectionId)
+        }
       }
       else {
         logger.info("connection no longer exists, clearing heartbeat interval", { connectionId })
@@ -59,6 +74,7 @@ export function connect(req: ValidatedRequest, res: Response): void {
       }
     }, heartbeatInterval)
 
+    // Limpa conexão quando o cliente desconecta
     req.on("close", () => {
       logger.info("request closed", { connectionId })
       connections.delete(connectionId)
@@ -69,6 +85,13 @@ export function connect(req: ValidatedRequest, res: Response): void {
         logger.error("error clearing heartbeat interval", { connectionId, error })
       }
       logger.info("client disconnected", { connectionId })
+    })
+
+    // Trata erros na resposta
+    res.on("error", (error) => {
+      logger.error("response error", { connectionId, error })
+      connections.delete(connectionId)
+      clearInterval(heartbeat)
     })
   }
   catch (error) {
@@ -94,7 +117,8 @@ export function broadcast(req: ValidatedRequest, res: Response): void {
 
     connections.forEach((clientRes, connectionId) => {
       try {
-        clientRes.write(`data: ${JSON.stringify(data)}\n`)
+        clientRes.write(`data: ${JSON.stringify(data)}\n\n`)
+        clientRes.flush?.() // Força o envio imediato
         successCount++
         logger.debug("Content sent to client successfully", { connectionId, content, type })
       }
@@ -153,7 +177,8 @@ export async function messageConnection(req: ValidatedRequest, res: Response): P
       timestamp: new Date().toISOString()
     }
 
-    clientRes.write(`data: ${JSON.stringify(data)}\n`)
+    clientRes.write(`data: ${JSON.stringify(data)}\n\n`)
+    clientRes.flush?.() // Força o envio imediato
     logger.info("content sent")
 
     res.status(200).json({

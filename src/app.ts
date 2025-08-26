@@ -1,3 +1,5 @@
+import path from "path"
+
 import routes from "./routes/index"
 
 import compression from "compression"
@@ -12,6 +14,10 @@ app.use(cors({
   exposedHeaders: ["forbbiden-reason"]
 }))
 app.use(express.json())
+
+// Servir arquivos estáticos da pasta public
+app.use(express.static(path.join(__dirname, "../public")))
+
 app.use("/", routes)
 
 export default app
