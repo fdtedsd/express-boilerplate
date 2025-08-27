@@ -26,16 +26,12 @@ export function connect(req: ValidatedRequest, res: Response): void {
     const connectionId = generateConnectionId()
     connections.set(connectionId, res)
 
-    // Headers para SSE e CORS local
+    // Headers específicos para SSE
+    // Nota: Headers de CORS são configurados globalmente no app.ts
     res.writeHead(200, {
       "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache, no-store, must-revalidate",
-      "Connection": "keep-alive",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Cache-Control, Content-Type, Authorization",
-      "Access-Control-Allow-Credentials": "true",
-      "X-Accel-Buffering": "no" // Desabilita buffering no nginx se estiver sendo usado
+      "Cache-Control": "no-cache, no-store",
+      "Connection": "keep-alive"
     })
 
     // Envia evento de conexão estabelecida
@@ -47,7 +43,12 @@ export function connect(req: ValidatedRequest, res: Response): void {
     }
 
     res.write(`data: ${JSON.stringify(connectedEvent)}\n\n`)
-    res.flush?.() // Força o envio imediato (se disponível)
+
+    // flushHeaders() força o envio imediato dos headers e dados
+    // Isso é necessário porque o compression aguarda a resposta finalizar para comprimir,
+    // mas em SSE a conexão nunca fecha, causando buffering
+    res.flushHeaders()
+
     logger.info("connection established", { connectionId })
 
     // Configura heartbeat
@@ -59,7 +60,7 @@ export function connect(req: ValidatedRequest, res: Response): void {
             timestamp: new Date().toISOString()
           }
           res.write(`data: ${JSON.stringify(heartbeatEvent)}\n\n`)
-          res.flush?.() // Força o envio imediato
+          res.flushHeaders() // Força o envio imediato
           logger.debug("heartbeat sent", { connectionId })
         }
         catch (error) {
@@ -118,7 +119,7 @@ export function broadcast(req: ValidatedRequest, res: Response): void {
     connections.forEach((clientRes, connectionId) => {
       try {
         clientRes.write(`data: ${JSON.stringify(data)}\n\n`)
-        clientRes.flush?.() // Força o envio imediato
+        clientRes.flushHeaders() // Força o envio imediato
         successCount++
         logger.debug("Content sent to client successfully", { connectionId, content, type })
       }
@@ -178,7 +179,7 @@ export async function messageConnection(req: ValidatedRequest, res: Response): P
     }
 
     clientRes.write(`data: ${JSON.stringify(data)}\n\n`)
-    clientRes.flush?.() // Força o envio imediato
+    clientRes.flushHeaders() // Força o envio imediato
     logger.info("content sent")
 
     res.status(200).json({
